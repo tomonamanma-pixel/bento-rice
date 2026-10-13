@@ -130,15 +130,7 @@
         bento.quantity = count > 0 ? count : null;
       });
       mergeCatalog(parsed);
-      parsed.rows.forEach(function (row) {
-        row.grams = gramText(row.grams);
-        if (row.bentoId === "original") row.bentoId = ORIGINAL_BENTO;
-        if (!row.bentoId) row.bentoId = null;
-        var selected = categoryForId(row.bentoId, parsed.bentos);
-        row.category = selected || (row.category === "bowl" ? "bowl" : "bento");
-      });
-      reflectRegisteredMenus(parsed);
-      ensureTrailingBlank(parsed);
+      parsed.rows = [blankRow()];
       return parsed;
     } catch (error) {
       return freshState();
@@ -852,16 +844,6 @@
       kept.push(row);
     });
     target.rows = kept;
-    target.bentos.forEach(function (bento) {
-      if (!(Number(bento.quantity) > 0)) return;
-      if (target.rows.some(function (row) { return row.bentoId === bento.id; })) return;
-      var row = blankRow(bento.category);
-      row.bentoId = bento.id;
-      row.quantity = String(bento.quantity);
-      var index = target.rows.findIndex(function (item) { return !item.bentoId && !item.quantity; });
-      if (index === -1) target.rows.push(row);
-      else target.rows.splice(index, 0, row);
-    });
   }
 
   function registeredQuantity(id) {
