@@ -203,7 +203,7 @@
 
   function showMake() {
     title.textContent = "炊飯計算";
-    navButton.textContent = "登録";
+    navButton.textContent = "マスター登録";
     adminMark.hidden = false;
     makeScreen.classList.add("active");
     adminScreen.classList.remove("active");

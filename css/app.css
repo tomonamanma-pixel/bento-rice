@@ -29,6 +29,8 @@ html, body {
 
 body {
   min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
 }
 
 button, input {
@@ -77,15 +79,23 @@ button {
 
 .admin-mark[hidden] { display: none; }
 
+#admin-screen.active {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
 .admin-gate {
   width: min(420px, 100%);
-  margin: 28px auto 0;
+  margin: 0 auto;
   padding: 28px 22px 22px;
   text-align: center;
 }
 
 .admin-gate h2 {
-  font-size: 26px;
+  margin-top: 18px;
+  font-size: 20.8px;
   line-height: 1.4;
 }
 
@@ -93,7 +103,7 @@ button {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 0;
 }
 
 .admin-actions .ghost,
@@ -129,6 +139,9 @@ h1 { font-size: 28px; }
 }
 
 .wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 20px max(16px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 }
 
@@ -541,5 +554,5 @@ select:focus {
   .total-card strong { font-size: 34px; }
   .total-card .sho { font-size: 26px; }
   .total-card em { font-size: 16px; }
-  .admin-gate h2 { font-size: 22px; }
+  .admin-gate h2 { font-size: 17.6px; }
 }

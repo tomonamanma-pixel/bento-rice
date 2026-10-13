@@ -1,11 +1,11 @@
-const CACHE = "bento-rice-v24";
+const CACHE = "bento-rice-v25";
 const FILES = [
   "./",
   "./index.html",
-  "./css/app.css?v=20",
-  "./js/menus.js?v=24",
+  "./css/app.css?v=25",
+  "./js/menus.js?v=25",
   "./js/calc.js",
-  "./js/app.js?v=24",
+  "./js/app.js?v=25",
   "./manifest.webmanifest",
   "./icons/icon-180.png",
   "./icons/icon-512.png",

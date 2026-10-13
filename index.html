@@ -11,14 +11,14 @@
   <title>炊飯計算</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
-  <link rel="stylesheet" href="css/app.css?v=20">
+  <link rel="stylesheet" href="css/app.css?v=25">
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
       <h1 id="title">炊飯計算</h1>
       <div class="topbar-actions">
-        <button type="button" class="ghost" id="nav-button">登録</button>
+        <button type="button" class="ghost" id="nav-button">マスター登録</button>
         <p class="admin-mark" id="admin-mark">管理者マスター</p>
       </div>
     </div>
@@ -55,11 +55,11 @@
 
     <section id="admin-screen" class="screen" aria-labelledby="admin-heading">
       <div class="panel admin-gate">
-        <h2 id="admin-heading">管理者のみ登録権限</h2>
         <div class="admin-actions">
           <button type="button" class="ghost" id="admin-back">戻る</button>
           <button type="button" class="primary" id="admin-enter">管理者</button>
         </div>
+        <h2 id="admin-heading">マスター管理者のみ編集可能です</h2>
       </div>
     </section>
 
@@ -159,8 +159,8 @@
     </div>
   </div>
 
-  <script src="js/menus.js?v=24"></script>
+  <script src="js/menus.js?v=25"></script>
   <script src="js/calc.js"></script>
-  <script src="js/app.js?v=24"></script>
+  <script src="js/app.js?v=25"></script>
 </body>
 </html>
