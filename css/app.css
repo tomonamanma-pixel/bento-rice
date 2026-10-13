@@ -97,7 +97,7 @@ button {
 
 .admin-gate h2 {
   margin-top: 18px;
-  font-size: 20.8px;
+  font-size: 18.72px;
   line-height: 1.4;
 }
 
@@ -556,5 +556,5 @@ select:focus {
   .total-card strong { font-size: 34px; }
   .total-card .sho { font-size: 26px; }
   .total-card em { font-size: 16px; }
-  .admin-gate h2 { font-size: 17.6px; }
+  .admin-gate h2 { font-size: 15.84px; }
 }
