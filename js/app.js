@@ -121,7 +121,7 @@
       if (!parsed || !Array.isArray(parsed.bentos) || !Array.isArray(parsed.rows)) return freshState();
       if (!parsed.rows.length) parsed.rows = [blankRow()];
       if (!Number.isFinite(parsed.yieldRatio) || parsed.yieldRatio <= 0) parsed.yieldRatio = 2.2;
-      parsed.leftover = digits(parsed.leftover).slice(0, 6) || "0";
+      parsed.leftover = "0";
       parsed.single = "0";
       if (!Array.isArray(parsed.bentos)) parsed.bentos = [];
       parsed.bentos.forEach(function (bento) {
