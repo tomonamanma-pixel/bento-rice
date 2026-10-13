@@ -42,13 +42,18 @@
   var pinChangeError = document.getElementById("pin-change-error");
   var confirmModal = document.getElementById("confirm-modal");
 
+  var adminMark = document.getElementById("admin-mark");
+  var adminScreen = document.getElementById("admin-screen");
+
   navButton.addEventListener("click", function () {
-    if (masterScreen.classList.contains("active")) {
-      showMake();
+    if (makeScreen.classList.contains("active")) {
+      showAdmin();
       return;
     }
-    openPin();
+    showMake();
   });
+  document.getElementById("admin-back").addEventListener("click", showMake);
+  document.getElementById("admin-enter").addEventListener("click", openPin);
 
   document.getElementById("clear-all").addEventListener("click", function () {
     confirmModal.hidden = false;
@@ -169,10 +174,23 @@
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
   }
 
+  function showAdmin() {
+    title.textContent = "炊飯計算";
+    navButton.textContent = "戻る";
+    adminMark.hidden = true;
+    makeScreen.classList.remove("active");
+    pinScreen.classList.remove("active");
+    masterScreen.classList.remove("active");
+    adminScreen.classList.add("active");
+    document.getElementById("admin-enter").focus();
+  }
+
   function showMake() {
     title.textContent = "炊飯計算";
     navButton.textContent = "登録";
+    adminMark.hidden = false;
     makeScreen.classList.add("active");
+    adminScreen.classList.remove("active");
     pinScreen.classList.remove("active");
     masterScreen.classList.remove("active");
     reflectRegisteredMenus(state);
@@ -191,6 +209,8 @@
     pinMode = state.pinHash ? "enter" : "setup";
     title.textContent = "登録";
     navButton.textContent = "製造へ";
+    adminMark.hidden = true;
+    adminScreen.classList.remove("active");
     if (pinMode === "setup") {
       pinHelp.textContent = "登録画面用の暗証番号を決めてください。4桁の数字です。忘れると、登録画面は開けなくなります。";
       pinALabel.textContent = "新しい番号";
@@ -211,6 +231,8 @@
   function showMaster() {
     title.textContent = "登録";
     navButton.textContent = "製造へ";
+    adminMark.hidden = true;
+    adminScreen.classList.remove("active");
     pinScreen.classList.remove("active");
     makeScreen.classList.remove("active");
     masterScreen.classList.add("active");

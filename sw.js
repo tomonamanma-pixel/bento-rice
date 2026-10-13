@@ -1,4 +1,4 @@
-const CACHE = "bento-rice-v15";
+const CACHE = "bento-rice-v18";
 const FILES = [
   "./",
   "./index.html",

@@ -16,7 +16,10 @@
   <header class="topbar">
     <div class="topbar-inner">
       <h1 id="title">炊飯計算</h1>
-      <button type="button" class="ghost" id="nav-button">登録</button>
+      <div class="topbar-actions">
+        <button type="button" class="ghost" id="nav-button">登録</button>
+        <p class="admin-mark" id="admin-mark">管理者マスター</p>
+      </div>
     </div>
   </header>
 
@@ -46,6 +49,16 @@
       </div>
       <div class="actions">
         <button type="button" class="clear-row wide" id="clear-all">一覧をクリア</button>
+      </div>
+    </section>
+
+    <section id="admin-screen" class="screen" aria-labelledby="admin-heading">
+      <div class="panel admin-gate">
+        <h2 id="admin-heading">管理者のみ登録権限</h2>
+        <div class="admin-actions">
+          <button type="button" class="ghost" id="admin-back">戻る</button>
+          <button type="button" class="primary" id="admin-enter">管理者</button>
+        </div>
       </div>
     </section>
 
