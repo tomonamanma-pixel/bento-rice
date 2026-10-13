@@ -1,8 +1,8 @@
-const CACHE = "bento-rice-v19";
+const CACHE = "bento-rice-v20";
 const FILES = [
   "./",
   "./index.html",
-  "./css/app.css",
+  "./css/app.css?v=20",
   "./js/calc.js",
   "./js/app.js",
   "./manifest.webmanifest",
@@ -28,7 +28,7 @@ self.addEventListener("activate", function (event) {
 
 self.addEventListener("fetch", function (event) {
   if (event.request.method !== "GET") return;
-  event.respondWith(fetch(event.request).then(function (response) {
+  event.respondWith(fetch(event.request, { cache: "no-cache" }).then(function (response) {
     var copy = response.clone();
     caches.open(CACHE).then(function (cache) {
       cache.put(event.request, copy);
