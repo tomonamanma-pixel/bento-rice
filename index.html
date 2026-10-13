@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f4d3a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="format-detection" content="telephone=no">
+  <title>炊飯計算</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <h1 id="title">炊飯計算</h1>
+      <button type="button" class="ghost" id="nav-button">登録</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="make-screen" class="screen active" aria-labelledby="title">
+      <div class="rows" id="rows"></div>
+      <div class="leftover">
+        <p class="stat"><span>必要ご飯の量</span> <strong id="needed-grams">0g</strong></p>
+        <span class="op" aria-hidden="true">＋</span>
+        <div class="field">
+          <label for="single-grams">店舗単品販売ご飯（ｇ）</label>
+          <input id="single-grams" type="text" inputmode="numeric" maxlength="6" value="0" autocomplete="off" enterkeyhint="next">
+        </div>
+        <span class="op" aria-hidden="true">ー</span>
+        <div class="field">
+          <label for="leftover-grams">残っているご飯（ｇ）</label>
+          <input id="leftover-grams" type="text" inputmode="numeric" maxlength="6" value="0" autocomplete="off" enterkeyhint="done">
+        </div>
+        <span class="op" aria-hidden="true">＝</span>
+        <p class="stat"><span>必要炊飯量</span> <strong id="net-grams">0g</strong></p>
+      </div>
+      <p class="meta" id="meta-line">必要炊飯量 0g ÷ 2.2　1升 = 生米1.5kg</p>
+      <div class="totals" aria-live="polite">
+        <div class="total-card">
+          <p class="total-item"><span>生米</span><strong id="kg-value">0.00<em>kg</em></strong><strong id="sho-value" class="sho">（0.00<em>升</em>）</strong></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button type="button" class="clear-row wide" id="clear-all">一覧をクリア</button>
+      </div>
+    </section>
+
+    <section id="pin-screen" class="screen" aria-labelledby="pin-heading">
+      <div class="panel">
+        <h2 id="pin-heading">暗証番号</h2>
+        <p class="help" id="pin-help"></p>
+        <div class="stack">
+          <div class="field">
+            <label for="pin-a" id="pin-a-label">暗証番号</label>
+            <input id="pin-a" type="password" inputmode="numeric" maxlength="4" autocomplete="off" enterkeyhint="next">
+          </div>
+          <div class="field" id="pin-b-wrap">
+            <label for="pin-b">もう一度</label>
+            <input id="pin-b" type="password" inputmode="numeric" maxlength="4" autocomplete="off" enterkeyhint="done">
+          </div>
+          <p class="error" id="pin-error" role="alert"></p>
+          <button type="button" class="primary" id="pin-submit">開く</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="master-screen" class="screen" aria-labelledby="master-heading">
+      <div class="panel">
+        <h2 id="master-heading">炊き上がり倍率</h2>
+        <p class="help">盛付の合計グラムをこの数で割り、生米の重さにします。</p>
+        <div class="field">
+          <label for="yield-ratio">倍率</label>
+          <input id="yield-ratio" type="number" inputmode="decimal" min="0.1" step="0.1">
+        </div>
+        <p class="error" id="yield-error" role="alert"></p>
+      </div>
+
+      <div class="panel">
+        <h2>メニューを追加</h2>
+        <div class="inline">
+          <div class="field">
+            <label for="new-category">プルダウン</label>
+            <select id="new-category">
+              <option value="bento">お弁当</option>
+              <option value="bowl">丼・重</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="new-name">名前</label>
+            <input id="new-name" type="text" maxlength="40" autocomplete="off" enterkeyhint="next">
+          </div>
+          <div class="field">
+            <label for="new-grams">1食（g）</label>
+            <input id="new-grams" type="number" inputmode="decimal" min="1" step="1" enterkeyhint="next">
+          </div>
+          <div class="field" id="new-quantity-field">
+            <label for="new-quantity">個数</label>
+            <input id="new-quantity" type="text" inputmode="numeric" maxlength="5" autocomplete="off" enterkeyhint="done">
+          </div>
+        </div>
+        <p class="error" id="add-error" role="alert"></p>
+        <button type="button" class="primary" id="add-bento">追加する</button>
+      </div>
+
+      <div class="panel">
+        <h2>登録済み</h2>
+        <p class="help">お弁当も丼・重も、基本の個数を登録します。製造の一覧には、その個数で最初から入ります。一覧の個数を変えると、その数で計算します。名前、1食のグラム、個数、出すプルダウンは変更できます。削除はできません。</p>
+        <div class="master-list" id="master-list"></div>
+      </div>
+
+      <div class="panel">
+        <h2>暗証番号の変更</h2>
+        <div class="stack">
+          <div class="field">
+            <label for="pin-current">今の番号</label>
+            <input id="pin-current" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pin-next">新しい番号</label>
+            <input id="pin-next" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="pin-next2">新しい番号をもう一度</label>
+            <input id="pin-next2" type="password" inputmode="numeric" maxlength="4" autocomplete="off">
+          </div>
+          <p class="error" id="pin-change-error" role="alert"></p>
+          <button type="button" class="primary" id="change-pin">番号を変更する</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="confirm-modal" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+      <h2 id="confirm-title">今日の製造を消しますか？</h2>
+      <p>一覧の行だけ消えます。弁当マスターはそのまま残ります。</p>
+      <div class="dialog-actions">
+        <button type="button" class="text-button" id="confirm-cancel">やめる</button>
+        <button type="button" class="danger" id="confirm-ok">消す</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/calc.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
