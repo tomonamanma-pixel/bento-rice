@@ -223,7 +223,7 @@
     pinMode = state.pinHash ? "enter" : "setup";
     title.textContent = "登録";
     navButton.hidden = false;
-    navButton.textContent = "製造へ";
+    navButton.textContent = "戻る";
     adminScreen.classList.remove("active");
     if (pinMode === "setup") {
       pinHelp.textContent = "登録画面用の暗証番号を決めてください。4桁の数字です。忘れると、登録画面は開けなくなります。";
