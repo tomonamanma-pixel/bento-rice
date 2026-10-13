@@ -129,6 +129,7 @@
         var count = Number(digits(bento.quantity).slice(0, 5));
         bento.quantity = count > 0 ? count : null;
       });
+      mergeCatalog(parsed);
       parsed.rows.forEach(function (row) {
         row.grams = gramText(row.grams);
         if (row.bentoId === "original") row.bentoId = ORIGINAL_BENTO;
@@ -145,14 +146,37 @@
   }
 
   function freshState() {
+    var source = window.RiceMenus && window.RiceMenus.length ? window.RiceMenus : SEED;
     return {
       pinHash: null,
       yieldRatio: 2.2,
       leftover: "0",
       single: "0",
-      bentos: SEED.map(function (bento) { return Object.assign({}, bento); }),
+      bentos: source.map(function (bento) { return Object.assign({}, bento); }),
       rows: [blankRow()],
     };
+  }
+
+  function mergeCatalog(parsed) {
+    var catalog = window.RiceMenus || [];
+    catalog.forEach(function (item) {
+      var key = calc.normalizeName(item.name);
+      var count = Number(item.quantity);
+      var existing = parsed.bentos.find(function (bento) {
+        return calc.normalizeName(bento.name) === key;
+      });
+      if (existing) {
+        if (!(Number(existing.quantity) > 0) && count > 0) existing.quantity = count;
+        return;
+      }
+      parsed.bentos.push({
+        id: item.id,
+        name: item.name,
+        grams: item.grams,
+        category: item.category === "bowl" ? "bowl" : "bento",
+        quantity: count > 0 ? count : null
+      });
+    });
   }
 
   function blankRow(category) {
