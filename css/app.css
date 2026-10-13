@@ -77,7 +77,8 @@ button {
   white-space: nowrap;
 }
 
-.admin-mark[hidden] { display: none; }
+.admin-mark[hidden],
+#nav-button[hidden] { display: none; }
 
 #admin-screen.active {
   display: flex;

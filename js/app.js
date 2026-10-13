@@ -191,8 +191,8 @@
   }
 
   function showAdmin() {
-    title.textContent = "炊飯計算";
-    navButton.textContent = "戻る";
+    title.textContent = "マスター登録";
+    navButton.hidden = true;
     adminMark.hidden = true;
     makeScreen.classList.remove("active");
     pinScreen.classList.remove("active");
@@ -203,6 +203,7 @@
 
   function showMake() {
     title.textContent = "炊飯計算";
+    navButton.hidden = false;
     navButton.textContent = "マスター登録";
     adminMark.hidden = false;
     makeScreen.classList.add("active");
@@ -224,6 +225,7 @@
     pinB.value = "";
     pinMode = state.pinHash ? "enter" : "setup";
     title.textContent = "登録";
+    navButton.hidden = false;
     navButton.textContent = "製造へ";
     adminMark.hidden = true;
     adminScreen.classList.remove("active");
@@ -246,6 +248,7 @@
 
   function showMaster() {
     title.textContent = "登録";
+    navButton.hidden = false;
     navButton.textContent = "製造へ";
     adminMark.hidden = true;
     adminScreen.classList.remove("active");
