@@ -69,15 +69,6 @@ button {
   gap: 12px;
 }
 
-.admin-mark {
-  margin: 0;
-  color: var(--cream);
-  font-size: 16px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.admin-mark[hidden],
 #nav-button[hidden] { display: none; }
 
 #admin-screen.active {
@@ -481,7 +472,6 @@ select:focus {
   }
 
   h1 { font-size: 24px; }
-  .admin-mark { font-size: 14px; }
 
   .leftover {
     grid-template-columns: 44px minmax(0, 1fr);

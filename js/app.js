@@ -42,7 +42,6 @@
   var pinChangeError = document.getElementById("pin-change-error");
   var confirmModal = document.getElementById("confirm-modal");
 
-  var adminMark = document.getElementById("admin-mark");
   var adminScreen = document.getElementById("admin-screen");
 
   navButton.addEventListener("click", function () {
@@ -193,7 +192,6 @@
   function showAdmin() {
     title.textContent = "マスター登録";
     navButton.hidden = true;
-    adminMark.hidden = true;
     makeScreen.classList.remove("active");
     pinScreen.classList.remove("active");
     masterScreen.classList.remove("active");
@@ -205,7 +203,6 @@
     title.textContent = "炊飯計算";
     navButton.hidden = false;
     navButton.textContent = "マスター登録";
-    adminMark.hidden = false;
     makeScreen.classList.add("active");
     adminScreen.classList.remove("active");
     pinScreen.classList.remove("active");
@@ -227,7 +224,6 @@
     title.textContent = "登録";
     navButton.hidden = false;
     navButton.textContent = "製造へ";
-    adminMark.hidden = true;
     adminScreen.classList.remove("active");
     if (pinMode === "setup") {
       pinHelp.textContent = "登録画面用の暗証番号を決めてください。4桁の数字です。忘れると、登録画面は開けなくなります。";
@@ -250,7 +246,6 @@
     title.textContent = "登録";
     navButton.hidden = false;
     navButton.textContent = "製造へ";
-    adminMark.hidden = true;
     adminScreen.classList.remove("active");
     pinScreen.classList.remove("active");
     makeScreen.classList.remove("active");
