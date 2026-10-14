@@ -341,6 +341,18 @@ select:focus {
   border-color: var(--green);
 }
 
+.pick.is-empty {
+  color: #9a938a;
+}
+
+.pick option {
+  color: var(--ink);
+}
+
+.pick option[value=""] {
+  color: #9a938a;
+}
+
 .stat { margin: 0; }
 
 .clear-row,

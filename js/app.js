@@ -328,7 +328,7 @@
 
   function menuOptions(category, selectedId) {
     var originalId = originalIdFor(category);
-    var placeholder = '<option value="">' + categoryLabel(category) + '</option>';
+    var placeholder = '<option value="">メニューを選択</option>';
     var original = '<option value="' + originalId + '"' + (selectedId === originalId ? " selected" : "") + ">オリジナル</option>";
     var options = state.bentos.filter(function (bento) {
       return bento.category === category;
@@ -884,6 +884,7 @@
     select.parentNode.replaceChild(pick, select);
     var value = selectionCategory(selectedId) === category ? (selectedId || "") : "";
     pick.value = value;
+    pick.classList.toggle("is-empty", !value);
     return pick;
   }
 
@@ -917,6 +918,7 @@
     }
     var value = selectionCategory(row.bentoId) === category ? (row.bentoId || "") : "";
     if ((select.value || "") !== value) select.value = value;
+    select.classList.toggle("is-empty", !value);
   }
 
   function reflectRegisteredMenus(target) {
