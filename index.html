@@ -11,7 +11,7 @@
   <title>炊飯計算</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
-  <link rel="stylesheet" href="css/app.css?v=32">
+  <link rel="stylesheet" href="css/app.css?v=33">
 </head>
 <body>
   <header class="topbar">
@@ -108,7 +108,7 @@
             <input id="new-name" type="text" maxlength="40" autocomplete="off" enterkeyhint="next">
           </div>
           <div class="field">
-            <label for="new-grams">1食（g）</label>
+            <label for="new-grams" id="new-grams-label">1食（g）</label>
             <input id="new-grams" type="number" inputmode="decimal" min="1" step="1" enterkeyhint="next">
           </div>
           <div class="field" id="new-quantity-field">
@@ -122,7 +122,7 @@
 
       <div class="panel">
         <h2>登録済み</h2>
-        <p class="help">お弁当も丼・重も米も、基本の個数を登録します。アプリを開いたときの製造一覧は空です。メニューを選ぶと、登録した個数が入ります。一覧の個数を変えると、その数で計算します。名前、1食のグラム、個数、出すプルダウンは変更できます。削除はできません。</p>
+        <p class="help">お弁当と丼・重は、基本の個数を登録します。米はプルダウン、名前、グラムだけで、個数はありません。アプリを開いたときの製造一覧は空です。メニューを選ぶと、お弁当と丼・重は登録した個数が入り、米は登録したグラムが必要量になります。削除はできません。</p>
         <div class="master-list" id="master-list"></div>
       </div>
 
@@ -159,8 +159,8 @@
     </div>
   </div>
 
-  <script src="js/menus.js?v=32"></script>
+  <script src="js/menus.js?v=33"></script>
   <script src="js/calc.js"></script>
-  <script src="js/app.js?v=32"></script>
+  <script src="js/app.js?v=33"></script>
 </body>
 </html>

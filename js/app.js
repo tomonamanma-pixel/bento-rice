@@ -94,10 +94,13 @@
 
   yieldInput.addEventListener("change", saveYield);
   document.getElementById("add-bento").addEventListener("click", addBento);
+  document.getElementById("new-category").addEventListener("change", syncNewCategory);
+  syncNewCategory();
   newGrams.addEventListener("keydown", function (event) {
     if (event.key !== "Enter") return;
     event.preventDefault();
-    document.getElementById("new-quantity").focus();
+    if (usesQuantity(document.getElementById("new-category").value)) document.getElementById("new-quantity").focus();
+    else addBento();
   });
   document.getElementById("new-quantity").addEventListener("keydown", function (event) {
     if (event.key !== "Enter") return;
@@ -297,9 +300,9 @@
 
   function rowElement(row) {
     var article = document.createElement("article");
-    article.className = "row" + (isComplete(row) ? " complete" : "");
-    article.dataset.rowId = row.id;
     var category = categoryId(row.category);
+    article.className = "row" + (usesQuantity(category) ? "" : " no-qty") + (isComplete(row) ? " complete" : "");
+    article.dataset.rowId = row.id;
     article.innerHTML =
       '<div class="menu-block">' +
         '<div class="kind" role="group" aria-label="種類">' +
@@ -308,11 +311,11 @@
         '<select id="menu-' + row.id + '" class="pick" data-category="' + category + '" aria-label="' + categoryLabel(category) + '">' + menuOptions(category, row.bentoId) + '</select>' +
       '</div>' +
       '<div class="stat per-stat">' +
-        '<label for="per-' + row.id + '">1食</label>' +
+        '<label for="per-' + row.id + '">' + (usesQuantity(category) ? "1食" : "g") + '</label>' +
         '<strong data-per>—</strong>' +
         '<input id="per-' + row.id + '" class="per-grams" type="text" inputmode="decimal" maxlength="7" placeholder="0" enterkeyhint="next" autocomplete="off" hidden>' +
       '</div>' +
-      '<div class="field">' +
+      '<div class="field"' + (usesQuantity(category) ? "" : " hidden") + '>' +
         '<label for="qty-' + row.id + '">個数</label>' +
         '<input id="qty-' + row.id + '" class="qty" type="text" inputmode="numeric" maxlength="5" placeholder="0" enterkeyhint="next" autocomplete="off">' +
       '</div>' +
@@ -359,12 +362,12 @@
       perInput.select();
       return;
     }
-    if (fixedQuantity && isComplete(row)) {
+    if (isComplete(row) && (fixedQuantity || !usesQuantity(row.category))) {
       var next = nextBlankAfter(row.id);
       if (next) focusBento(next.id);
       return;
     }
-    if (row.bentoId) {
+    if (row.bentoId && usesQuantity(row.category)) {
       var qty = rowEl.querySelector(".qty");
       qty.focus();
       qty.select();
@@ -404,12 +407,23 @@
     if (event.target.classList.contains("pick")) {
       event.preventDefault();
       if (isOriginalId(row.bentoId)) rowEl.querySelector(".per-grams").focus();
-      else if (row.bentoId) rowEl.querySelector(".qty").focus();
+      else if (row.bentoId && usesQuantity(row.category)) rowEl.querySelector(".qty").focus();
       return;
     }
     if (event.target.classList.contains("per-grams")) {
       event.preventDefault();
-      rowEl.querySelector(".qty").focus();
+      if (usesQuantity(row.category)) {
+        rowEl.querySelector(".qty").focus();
+        return;
+      }
+      if (!isComplete(row)) return;
+      var addedRice = ensureTrailingBlank(state);
+      if (addedRice) {
+        save();
+        rowsEl.appendChild(rowElement(addedRice));
+      }
+      var nextRice = nextBlankAfter(row.id);
+      if (nextRice) focusBento(nextRice.id);
       return;
     }
     if (event.target.classList.contains("qty")) {
@@ -465,7 +479,7 @@
     perLabel.htmlFor = original ? perInput.id : "";
     if (original) {
       if (perInput.value !== row.grams) perInput.value = row.grams;
-      var custom = calc.lineCookedGrams(Number(row.grams), Number(row.quantity));
+      var custom = lineAmount(Number(row.grams), row.quantity, row.category);
       line.textContent = custom > 0 ? formatGrams(custom) : "—";
       clearButton.setAttribute("aria-label", originalLabel(row.bentoId) + "の行をクリア");
       return;
@@ -477,7 +491,7 @@
       return;
     }
     per.textContent = formatGrams(bento.grams);
-    var cooked = calc.lineCookedGrams(bento.grams, Number(row.quantity));
+    var cooked = lineAmount(bento.grams, row.quantity, row.category);
     line.textContent = cooked > 0 ? formatGrams(cooked) : "—";
     clearButton.setAttribute("aria-label", bento.name + "の行をクリア");
   }
@@ -508,11 +522,11 @@
 
   function rowCookedGrams(row) {
     if (isOriginalId(row.bentoId)) {
-      return calc.lineCookedGrams(Number(row.grams), Number(row.quantity));
+      return lineAmount(Number(row.grams), row.quantity, row.category);
     }
     var bento = bentoById(row.bentoId);
     if (!bento) return 0;
-    return calc.lineCookedGrams(bento.grams, Number(row.quantity));
+    return lineAmount(bento.grams, row.quantity, row.category);
   }
 
   function patchTotals() {
@@ -557,16 +571,19 @@
   }
 
   function masterItemHtml(bento) {
-    var quantityField = '<div class="field"><label for="qty-master-' + bento.id + '">個数</label>' +
-      '<input id="qty-master-' + bento.id + '" class="master-qty" type="text" inputmode="numeric" maxlength="5" value="' + escapeAttr(bento.quantity ? String(bento.quantity) : "") + '"></div>';
-    return '<div class="master-item" data-bento-id="' + escapeAttr(bento.id) + '">' +
+    var counted = usesQuantity(bento.category);
+    var quantityField = counted
+      ? '<div class="field"><label for="qty-master-' + bento.id + '">個数</label>' +
+        '<input id="qty-master-' + bento.id + '" class="master-qty" type="text" inputmode="numeric" maxlength="5" value="' + escapeAttr(bento.quantity ? String(bento.quantity) : "") + '"></div>'
+      : "";
+    return '<div class="master-item' + (counted ? "" : " no-qty") + '" data-bento-id="' + escapeAttr(bento.id) + '">' +
       '<div class="field"><label for="category-' + bento.id + '">プルダウン</label>' +
       '<select id="category-' + bento.id + '" class="master-category">' +
       categoryOptions(bento.category) +
       "</select></div>" +
       '<div class="field"><label for="name-' + bento.id + '">名前</label>' +
       '<input id="name-' + bento.id + '" class="master-name" type="text" maxlength="40" value="' + escapeAttr(bento.name) + '"></div>' +
-      '<div class="field"><label for="grams-' + bento.id + '">1食（g）</label>' +
+      '<div class="field"><label for="grams-' + bento.id + '">' + (counted ? "1食（g）" : "g") + '</label>' +
       '<input id="grams-' + bento.id + '" class="master-grams" type="number" inputmode="decimal" min="1" step="1" value="' + escapeAttr(String(bento.grams)) + '"></div>' +
       quantityField +
       "</div>";
@@ -654,14 +671,14 @@
       return;
     }
     if (!Number.isFinite(grams) || grams <= 0) {
-      addError.textContent = "1食のグラムを入力してください。";
+      addError.textContent = usesQuantity(category) ? "1食のグラムを入力してください。" : "グラムを入力してください。";
       return;
     }
-    if (!(quantity > 0)) {
+    if (usesQuantity(category) && !(quantity > 0)) {
       addError.textContent = "個数を入力してください。";
       return;
     }
-    var item = { id: uid(), name: name, grams: grams, category: category, quantity: quantity };
+    var item = { id: uid(), name: name, grams: grams, category: category, quantity: usesQuantity(category) ? quantity : null };
     state.bentos.push(item);
     reflectRegisteredMenus(state);
     newName.value = "";
@@ -718,10 +735,13 @@
 
   function rowComplete(row, bentos) {
     if (isOriginalId(row.bentoId)) {
+      if (!usesQuantity(row.category)) return Number(row.grams) > 0;
       return Number(row.grams) > 0 && Number(row.quantity) > 0;
     }
     var bento = findBento(bentos, row.bentoId);
-    return Boolean(bento && Number(row.quantity) > 0);
+    if (!bento) return false;
+    if (!usesQuantity(row.category)) return Number(bento.grams) > 0;
+    return Number(row.quantity) > 0;
   }
 
   function isBlank(row) {
@@ -777,6 +797,23 @@
   function categoryId(value) {
     if (value === "bowl" || value === "rice") return value;
     return "bento";
+  }
+
+  function usesQuantity(category) {
+    return categoryId(category) !== "rice";
+  }
+
+  function lineAmount(grams, quantity, category) {
+    var amount = Number(grams);
+    if (!usesQuantity(category)) return amount > 0 ? amount : 0;
+    return calc.lineCookedGrams(amount, Number(quantity));
+  }
+
+  function syncNewCategory() {
+    var category = document.getElementById("new-category").value;
+    var counted = usesQuantity(category);
+    document.getElementById("new-quantity-field").hidden = !counted;
+    document.getElementById("new-grams-label").textContent = counted ? "1食（g）" : "g";
   }
 
   function categoryLabel(id) {
@@ -856,6 +893,12 @@
       button.setAttribute("aria-pressed", button.dataset.category === category ? "true" : "false");
     });
     var select = rowEl.querySelector(".pick");
+    var counted = usesQuantity(category);
+    rowEl.classList.toggle("no-qty", !counted);
+    var qtyField = rowEl.querySelector(":scope > .field");
+    if (qtyField) qtyField.hidden = !counted;
+    var perLabel = rowEl.querySelector(".per-stat label");
+    if (perLabel) perLabel.textContent = counted ? "1食" : "g";
     select.setAttribute("aria-label", categoryLabel(category));
     if (select.dataset.category !== category) {
       select.dataset.category = category;
@@ -869,7 +912,7 @@
     var seen = {};
     target.rows.forEach(function (row) {
       var bento = findBento(target.bentos, row.bentoId);
-      if (bento && Number(bento.quantity) > 0) {
+      if (bento && (!usesQuantity(bento.category) || Number(bento.quantity) > 0)) {
         if (seen[bento.id]) return;
         seen[bento.id] = true;
         row.category = categoryId(bento.category);
