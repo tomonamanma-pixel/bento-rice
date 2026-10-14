@@ -345,6 +345,8 @@
     var row = rowById(rowEl.dataset.rowId);
     if (!row) return;
     row.bentoId = event.target.value || null;
+    var chosenCategory = selectionCategory(row.bentoId);
+    if (chosenCategory && chosenCategory !== categoryId(row.category)) row.category = chosenCategory;
     var fixedQuantity = registeredQuantity(row.bentoId);
     if (fixedQuantity) {
       row.quantity = fixedQuantity;
@@ -866,14 +868,23 @@
       rowEl.querySelector(".qty").value = "";
     }
     row.category = next;
-    var select = rowEl.querySelector(".pick");
-    select.dataset.category = next;
-    select.innerHTML = menuOptions(next, row.bentoId);
+    var select = replacePick(rowEl.querySelector(".pick"), next, row.bentoId);
     fillDerived(rowEl, row);
     rowEl.classList.toggle("complete", isComplete(row));
     save();
     patchTotals();
     select.focus();
+  }
+
+  function replacePick(select, category, selectedId) {
+    var pick = select.cloneNode(false);
+    pick.dataset.category = category;
+    pick.setAttribute("aria-label", categoryLabel(category));
+    pick.innerHTML = menuOptions(category, selectedId);
+    select.parentNode.replaceChild(pick, select);
+    var value = selectionCategory(selectedId) === category ? (selectedId || "") : "";
+    pick.value = value;
+    return pick;
   }
 
   function isOriginalId(id) {
@@ -901,10 +912,11 @@
     if (perLabel) perLabel.textContent = counted ? "1食" : "g";
     select.setAttribute("aria-label", categoryLabel(category));
     if (select.dataset.category !== category) {
-      select.dataset.category = category;
-      select.innerHTML = menuOptions(category, row.bentoId);
+      replacePick(select, category, row.bentoId);
+      return;
     }
-    select.value = selectionCategory(row.bentoId) === category ? row.bentoId : "";
+    var value = selectionCategory(row.bentoId) === category ? (row.bentoId || "") : "";
+    if ((select.value || "") !== value) select.value = value;
   }
 
   function reflectRegisteredMenus(target) {
