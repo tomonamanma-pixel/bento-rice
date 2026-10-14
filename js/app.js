@@ -320,7 +320,7 @@
 
   function menuOptions(category, selectedId) {
     var originalId = category === "bowl" ? ORIGINAL_BOWL : ORIGINAL_BENTO;
-    var placeholder = '<option value="">選択</option>';
+    var placeholder = '<option value="">' + (category === "bowl" ? "丼・重" : "お弁当") + '</option>';
     var original = '<option value="' + originalId + '"' + (selectedId === originalId ? " selected" : "") + ">オリジナル</option>";
     var options = state.bentos.filter(function (bento) {
       return bento.category === category;
