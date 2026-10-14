@@ -2,6 +2,12 @@
   var STORAGE_KEY = "bento-rice-v1";
   var ORIGINAL_BENTO = "original-bento";
   var ORIGINAL_BOWL = "original-bowl";
+  var ORIGINAL_RICE = "original-rice";
+  var CATEGORIES = [
+    { id: "bento", label: "お弁当" },
+    { id: "bowl", label: "丼・重" },
+    { id: "rice", label: "米" }
+  ];
   var calc = window.RiceCalc;
 
   var SEED = [
@@ -164,7 +170,7 @@
         id: item.id,
         name: item.name,
         grams: item.grams,
-        category: item.category === "bowl" ? "bowl" : "bento",
+        category: categoryId(item.category),
         quantity: count > 0 ? count : null
       });
     });
@@ -176,7 +182,7 @@
       bentoId: null,
       grams: "",
       quantity: "",
-      category: category === "bowl" ? "bowl" : "bento",
+      category: categoryId(category),
     };
   }
 
@@ -293,14 +299,13 @@
     var article = document.createElement("article");
     article.className = "row" + (isComplete(row) ? " complete" : "");
     article.dataset.rowId = row.id;
-    var category = row.category === "bowl" ? "bowl" : "bento";
+    var category = categoryId(row.category);
     article.innerHTML =
       '<div class="menu-block">' +
         '<div class="kind" role="group" aria-label="種類">' +
-          '<button type="button" class="kind-button" data-action="kind" data-category="bento" aria-pressed="' + (category === "bento" ? "true" : "false") + '">お弁当</button>' +
-          '<button type="button" class="kind-button" data-action="kind" data-category="bowl" aria-pressed="' + (category === "bowl" ? "true" : "false") + '">丼・重</button>' +
+          kindButtons(category) +
         '</div>' +
-        '<select id="menu-' + row.id + '" class="pick" data-category="' + category + '" aria-label="' + (category === "bowl" ? "丼・重" : "お弁当") + '">' + menuOptions(category, row.bentoId) + '</select>' +
+        '<select id="menu-' + row.id + '" class="pick" data-category="' + category + '" aria-label="' + categoryLabel(category) + '">' + menuOptions(category, row.bentoId) + '</select>' +
       '</div>' +
       '<div class="stat per-stat">' +
         '<label for="per-' + row.id + '">1食</label>' +
@@ -319,8 +324,8 @@
   }
 
   function menuOptions(category, selectedId) {
-    var originalId = category === "bowl" ? ORIGINAL_BOWL : ORIGINAL_BENTO;
-    var placeholder = '<option value="">' + (category === "bowl" ? "丼・重" : "お弁当") + '</option>';
+    var originalId = originalIdFor(category);
+    var placeholder = '<option value="">' + categoryLabel(category) + '</option>';
     var original = '<option value="' + originalId + '"' + (selectedId === originalId ? " selected" : "") + ">オリジナル</option>";
     var options = state.bentos.filter(function (bento) {
       return bento.category === category;
@@ -524,12 +529,12 @@
   }
 
   function paintMaster() {
-    masterList.innerHTML = ["bento", "bowl"].map(function (category) {
-      var items = state.bentos.filter(function (bento) { return bento.category === category; });
+    masterList.innerHTML = CATEGORIES.map(function (item) {
+      var items = state.bentos.filter(function (bento) { return bento.category === item.id; });
       var body = items.length
         ? items.map(masterItemHtml).join("")
         : '<p class="help empty-group">まだありません</p>';
-      return '<section class="master-group"><h3>' + (category === "bowl" ? "丼・重" : "お弁当") + "</h3>" + body + "</section>";
+      return '<section class="master-group"><h3>' + item.label + "</h3>" + body + "</section>";
     }).join("");
     masterList.querySelectorAll(".master-item").forEach(function (item) {
       var id = item.dataset.bentoId;
@@ -557,8 +562,7 @@
     return '<div class="master-item" data-bento-id="' + escapeAttr(bento.id) + '">' +
       '<div class="field"><label for="category-' + bento.id + '">プルダウン</label>' +
       '<select id="category-' + bento.id + '" class="master-category">' +
-      '<option value="bento"' + (bento.category === "bento" ? " selected" : "") + ">お弁当</option>" +
-      '<option value="bowl"' + (bento.category === "bowl" ? " selected" : "") + ">丼・重</option>" +
+      categoryOptions(bento.category) +
       "</select></div>" +
       '<div class="field"><label for="name-' + bento.id + '">名前</label>' +
       '<input id="name-' + bento.id + '" class="master-name" type="text" maxlength="40" value="' + escapeAttr(bento.name) + '"></div>' +
@@ -605,7 +609,7 @@
 
   function recategorizeBento(id, input) {
     var bento = bentoById(id);
-    bento.category = input.value === "bowl" ? "bowl" : "bento";
+    bento.category = categoryId(input.value);
     addError.textContent = "";
     save();
     paintMaster();
@@ -638,7 +642,7 @@
     var quantityInput = document.getElementById("new-quantity");
     var name = newName.value.trim();
     var grams = Number(newGrams.value);
-    var category = categoryInput.value === "bowl" ? "bowl" : "bento";
+    var category = categoryId(categoryInput.value);
     var quantity = Number(digits(quantityInput.value).slice(0, 5));
     addError.textContent = "";
     if (!name) {
@@ -770,8 +774,36 @@
     confirmModal.hidden = true;
   }
 
+  function categoryId(value) {
+    if (value === "bowl" || value === "rice") return value;
+    return "bento";
+  }
+
+  function categoryLabel(id) {
+    var found = CATEGORIES.find(function (item) { return item.id === id; });
+    return found ? found.label : "お弁当";
+  }
+
+  function originalIdFor(category) {
+    if (category === "bowl") return ORIGINAL_BOWL;
+    if (category === "rice") return ORIGINAL_RICE;
+    return ORIGINAL_BENTO;
+  }
+
+  function kindButtons(category) {
+    return CATEGORIES.map(function (item) {
+      return '<button type="button" class="kind-button" data-action="kind" data-category="' + item.id + '" aria-pressed="' + (category === item.id ? "true" : "false") + '">' + item.label + "</button>";
+    }).join("");
+  }
+
+  function categoryOptions(selected) {
+    return CATEGORIES.map(function (item) {
+      return '<option value="' + item.id + '"' + (selected === item.id ? " selected" : "") + ">" + item.label + "</option>";
+    }).join("");
+  }
+
   function inferCategory(bento) {
-    if (bento.category === "bowl" || bento.category === "bento") return bento.category;
+    if (bento.category === "bowl" || bento.category === "bento" || bento.category === "rice") return bento.category;
     return /丼|重/.test(String(bento.name || "")) ? "bowl" : "bento";
   }
 
@@ -781,13 +813,14 @@
 
   function categoryForId(id, bentos) {
     if (id === ORIGINAL_BOWL) return "bowl";
+    if (id === ORIGINAL_RICE) return "rice";
     if (id === ORIGINAL_BENTO) return "bento";
     var bento = findBento(bentos, id);
     return bento ? inferCategory(bento) : "";
   }
 
   function applyCategory(rowEl, row, category) {
-    var next = category === "bowl" ? "bowl" : "bento";
+    var next = categoryId(category);
     if (selectionCategory(row.bentoId) !== next) {
       row.bentoId = null;
       row.grams = "";
@@ -807,21 +840,23 @@
   }
 
   function isOriginalId(id) {
-    return id === ORIGINAL_BENTO || id === ORIGINAL_BOWL;
+    return id === ORIGINAL_BENTO || id === ORIGINAL_BOWL || id === ORIGINAL_RICE;
   }
 
   function originalLabel(id) {
-    return id === ORIGINAL_BOWL ? "オリジナルの丼・重" : "オリジナルのお弁当";
+    if (id === ORIGINAL_BOWL) return "オリジナルの丼・重";
+    if (id === ORIGINAL_RICE) return "オリジナルの米";
+    return "オリジナルのお弁当";
   }
 
   function syncKind(rowEl, row) {
-    var category = row.category === "bowl" ? "bowl" : "bento";
+    var category = categoryId(row.category);
     row.category = category;
     rowEl.querySelectorAll("[data-action='kind']").forEach(function (button) {
       button.setAttribute("aria-pressed", button.dataset.category === category ? "true" : "false");
     });
     var select = rowEl.querySelector(".pick");
-    select.setAttribute("aria-label", category === "bowl" ? "丼・重" : "お弁当");
+    select.setAttribute("aria-label", categoryLabel(category));
     if (select.dataset.category !== category) {
       select.dataset.category = category;
       select.innerHTML = menuOptions(category, row.bentoId);
@@ -837,7 +872,7 @@
       if (bento && Number(bento.quantity) > 0) {
         if (seen[bento.id]) return;
         seen[bento.id] = true;
-        row.category = bento.category === "bowl" ? "bowl" : "bento";
+        row.category = categoryId(bento.category);
       }
       kept.push(row);
     });

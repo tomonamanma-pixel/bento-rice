@@ -265,6 +265,7 @@ h1 { font-size: 28px; }
 
 .kind {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
 }
 
