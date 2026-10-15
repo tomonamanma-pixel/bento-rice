@@ -993,6 +993,13 @@
 
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
-    navigator.serviceWorker.register("sw.js").catch(function () {});
+    var hadController = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker.addEventListener("controllerchange", function () {
+      if (!hadController) return;
+      location.reload();
+    });
+    navigator.serviceWorker.register("sw.js?v=36").then(function (reg) {
+      reg.update();
+    }).catch(function () {});
   }
 })();
