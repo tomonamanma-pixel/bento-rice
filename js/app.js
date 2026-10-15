@@ -998,7 +998,7 @@
       if (!hadController) return;
       location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=36").then(function (reg) {
+    navigator.serviceWorker.register("sw.js?v=37").then(function (reg) {
       reg.update();
     }).catch(function () {});
   }
