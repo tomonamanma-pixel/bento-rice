@@ -538,10 +538,19 @@
     var net = calc.netCookedGrams(cooked, leftover, single);
     var result = calc.summarize(net, state.yieldRatio);
     kgValue.innerHTML = result.kg.toFixed(2) + "<em>kg</em>";
-    shoValue.innerHTML = "（" + result.sho.toFixed(2) + "<em>升</em>）";
+    shoValue.innerHTML = formatShoGo(result.sho);
     neededGrams.textContent = formatGrams(cooked);
     netGrams.textContent = formatGrams(net);
     metaLine.textContent = "必要炊飯量 " + formatGrams(net) + " ÷ " + trimNumber(state.yieldRatio) + "　1升 = 生米1.5kg";
+  }
+
+  function formatShoGo(sho) {
+    var total = calc.roundHalfUp(Number(sho), 2);
+    if (!(total > 0)) total = 0;
+    var shoInt = Math.floor(total + 1e-9);
+    var go = calc.roundHalfUp((total - shoInt) * 10, 1);
+    var goText = String(go).replace(/\.0$/, "");
+    return "（" + shoInt + "<em>升</em>" + goText + "<em>合</em>）";
   }
 
   function paintMaster() {
@@ -998,7 +1007,7 @@
       if (!hadController) return;
       location.reload();
     });
-    navigator.serviceWorker.register("sw.js?v=37").then(function (reg) {
+    navigator.serviceWorker.register("sw.js?v=38").then(function (reg) {
       reg.update();
     }).catch(function () {});
   }
